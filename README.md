@@ -8,3 +8,6 @@ Goal: construct a naive bayes classifier to predict the results of basketball ga
 
 # Usage
 ./NaiveBayesClassifier.sh train_data.csv test_data.csv
+
+# Versions
+- Python3
