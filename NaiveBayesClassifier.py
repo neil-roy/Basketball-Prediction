@@ -63,6 +63,8 @@ class NaiveBayesClassifier:
                 probs[c] = np.log(self.class_priors[c])
                 # continuous variables
                 for variable in X.columns.difference(categorical_cols):
+                    if (variable == 'label'):
+                        continue
                     mean = self.continuous_variable_stats[c][variable]["mean"]
                     var = self.continuous_variable_stats[c][variable]["var"]
                     likelihood = self.calculate_likelihood(x[variable], mean, var)
@@ -88,8 +90,9 @@ if __name__ == "__main__":
 
     # load testing data
     test_data = pd.read_csv(test_file)
-    test_results = test_data['label']
-    test_features = test_data.drop(columns=['label'])
+    # test_results = test_data['label']
+    # test_features = test_data.drop(columns=['label'])
+    test_features = test_data
 
     # create a list of all the categorical column names
     categorical_cols = ['team_abbreviation_home', 'team_abbreviation_away', 'season_type', 'home_wl_pre5', 'away_wl_pre5']
