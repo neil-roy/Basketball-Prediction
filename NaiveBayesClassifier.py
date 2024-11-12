@@ -33,6 +33,8 @@ class NaiveBayesClassifier:
             for c in self.class_priors:
                 class_probs[c] = np.log(self.class_priors[c])
                 for feature in X.columns:
+                    if (feature == "label"):
+                        continue
                     mean = self.feature_stats[feature][c]["mean"]
                     var = self.feature_stats[feature][c]["var"]
                     likelihood = self.calculate_likelihood(x[feature], mean, var)
@@ -47,9 +49,8 @@ if __name__ == "__main__":
 
     # Load training data
     train_data = pd.read_csv(train_file)
-    train_data['home_win'] = (train_data['pts_home_avg5'] > train_data['pts_away_avg5']).astype(int)
-    y_train = train_data['home_win']
-    X_train = train_data.drop(columns=['home_win'])
+    y_train = train_data['label']
+    X_train = train_data.drop(columns=['label'])
 
     # Encode categorical columns
     categorical_cols = ['team_abbreviation_home', 'team_abbreviation_away', 'season_type', 'home_wl_pre5', 'away_wl_pre5']
@@ -69,3 +70,8 @@ if __name__ == "__main__":
     predictions = nb_classifier.predict(test_data)
     for prediction in predictions:
         print(prediction)
+
+    # Calculate accuracy
+    y_test = test_data['label'].values
+    accuracy = np.mean(predictions == y_test)
+    print(f"Accuracy: {accuracy}")
