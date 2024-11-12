@@ -41,7 +41,7 @@ class NaiveBayesClassifier:
                 probs = {}
                 for i in categories:
                     count = variable_counts.get(i, 0) + 1
-                    prob = count / (total_count_c + num_categories)
+                    prob = count / (total_count_c + num_categories + 1)
                     probs[i] = prob
                 self.categorical_variable_probs[c][variable] = {
                     'probs': probs,
@@ -53,6 +53,12 @@ class NaiveBayesClassifier:
     def calculate_likelihood(self, x, mean, var):
         exponent = np.exp(-((x - mean) ** 2) / (2 * var))
         return (1 / np.sqrt(2 * np.pi * var)) * exponent
+    
+    # def calculate_likelihood(self, x, mean, var):
+    #     # Using logarithms to prevent underflow
+    #     exponent = -((x - mean) ** 2) / (2 * var)
+    #     return exponent - 0.5 * np.log(2 * np.pi * var)
+
     
     # Function: predict the input data
     def predict(self, X, categorical_cols):
