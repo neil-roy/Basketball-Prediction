@@ -93,7 +93,7 @@ if __name__ == "__main__":
     # test_results = test_data['label']
     # test_features = test_data.drop(columns=['label'])
     test_features = test_data
-
+    
     # create a list of all the categorical column names
     categorical_cols = ['team_abbreviation_home', 'team_abbreviation_away', 'season_type', 'home_wl_pre5', 'away_wl_pre5']
 
@@ -117,3 +117,29 @@ if __name__ == "__main__":
     # calculate the accuracy (local use only)
     # accuracy = np.mean(predictions == test_results)
     # print(f"Accuracy: {accuracy}")
+        
+        
+
+# End of file
+        
+
+# Testing ideas for improvement in accuracy
+# 1. Add more features
+
+# Function: calculate information gain for each feature
+    
+# def calculate_information_gain(X, y):
+#     information_gains = {}
+#     for column in X.columns:
+#         values = X[column].unique()
+#         entropy = 0
+#         for value in values:
+#             p = len(X[X[column] == value]) / len(X)
+#             entropy += p * np.log2(p)
+#         information_gains[column] = entropy
+#     return information_gains
+
+# gains = calculate_information_gain(features, results)
+# # sort gains
+# sorted_gains = sorted(gains.items(), key=lambda x: x[1], reverse=True)
+# print(sorted_gains)
