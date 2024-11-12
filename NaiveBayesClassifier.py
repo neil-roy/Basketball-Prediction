@@ -117,7 +117,7 @@
 
 
 
-
+import sys
 import numpy as np
 import pandas as pd
 
@@ -127,17 +127,10 @@ class NaiveBayesClassifier:
         self.feature_stats = {}
 
     def fit(self, X, y):
-        """
-        Fit the Naive Bayes model according to the training data.
-        X: DataFrame of features
-        y: Series of labels (0 for away win, 1 for home win)
-        """
-        # Calculate class priors
         class_counts = y.value_counts().to_dict()
         total_samples = len(y)
         self.class_priors = {c: class_counts[c] / total_samples for c in class_counts}
 
-        # Calculate mean and variance for each feature by class
         self.feature_stats = {}
         for feature in X.columns:
             self.feature_stats[feature] = {}
@@ -145,65 +138,53 @@ class NaiveBayesClassifier:
                 feature_values = X[feature][y == c]
                 self.feature_stats[feature][c] = {
                     "mean": feature_values.mean(),
-                    "var": feature_values.var() + 1e-6  # add small value to avoid zero variance
+                    "var": feature_values.var() + 1e-6
                 }
 
     def calculate_likelihood(self, x, mean, var):
-        """
-        Calculate the Gaussian likelihood of a feature value given mean and variance.
-        """
         exponent = np.exp(-((x - mean) ** 2) / (2 * var))
         return (1 / np.sqrt(2 * np.pi * var)) * exponent
 
     def predict(self, X):
-        """
-        Predict the class labels for the given data.
-        X: DataFrame of features
-        Returns: List of predicted class labels
-        """
         y_pred = []
         for _, x in X.iterrows():
             class_probs = {}
             for c in self.class_priors:
-                # Start with prior probability of the class
-                class_probs[c] = np.log(self.class_priors[c])  # Use log to prevent underflow
+                class_probs[c] = np.log(self.class_priors[c])
                 for feature in X.columns:
                     mean = self.feature_stats[feature][c]["mean"]
                     var = self.feature_stats[feature][c]["var"]
                     likelihood = self.calculate_likelihood(x[feature], mean, var)
-                    class_probs[c] += np.log(likelihood)  # Sum log probabilities
-
-            # Choose the class with the highest posterior probability
+                    class_probs[c] += np.log(likelihood)
             y_pred.append(max(class_probs, key=class_probs.get))
         return y_pred
 
-# Load training data
-train_data = pd.read_csv('train_data.csv')
+if __name__ == "__main__":
+    # Read file paths from command line arguments
+    train_file = sys.argv[1]
+    test_file = sys.argv[2]
 
-# Preprocess training data
-train_data['home_win'] = (train_data['pts_home_avg5'] > train_data['pts_away_avg5']).astype(int)
-y_train = train_data['home_win']  # target variable
-X_train = train_data.drop(columns=['home_win'])
+    # Load training data
+    train_data = pd.read_csv(train_file)
+    train_data['home_win'] = (train_data['pts_home_avg5'] > train_data['pts_away_avg5']).astype(int)
+    y_train = train_data['home_win']
+    X_train = train_data.drop(columns=['home_win'])
 
-# Encode categorical columns
-categorical_cols = ['team_abbreviation_home', 'team_abbreviation_away', 'season_type', 'home_wl_pre5', 'away_wl_pre5']
-for col in categorical_cols:
-    X_train[col] = pd.factorize(X_train[col])[0]
+    # Encode categorical columns
+    categorical_cols = ['team_abbreviation_home', 'team_abbreviation_away', 'season_type', 'home_wl_pre5', 'away_wl_pre5']
+    for col in categorical_cols:
+        X_train[col] = pd.factorize(X_train[col])[0]
 
-# Train Naive Bayes classifier
-nb_classifier = NaiveBayesClassifier()
-nb_classifier.fit(X_train, y_train)
+    # Train Naive Bayes classifier
+    nb_classifier = NaiveBayesClassifier()
+    nb_classifier.fit(X_train, y_train)
 
-# Load validation data
-validation_data = pd.read_csv('validation_data.csv')
+    # Load test data (validation data)
+    test_data = pd.read_csv(test_file)
+    for col in categorical_cols:
+        test_data[col] = pd.factorize(test_data[col])[0]
 
-# Preprocess validation data (apply the same encoding as training data)
-for col in categorical_cols:
-    validation_data[col] = pd.factorize(validation_data[col])[0]
-
-# Predict and output results
-predictions = nb_classifier.predict(validation_data)
-
-# Print each prediction (either 0 or 1) line by line
-for prediction in predictions:
-    print(prediction)
+    # Predict and output results
+    predictions = nb_classifier.predict(test_data)
+    for prediction in predictions:
+        print(prediction)
