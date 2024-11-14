@@ -96,7 +96,6 @@ if __name__ == "__main__":
 
     # load testing data
     test_data = pd.read_csv(test_file)
-    # test_results = test_data['label']
     # test_features = test_data.drop(columns=['label'])
     test_features = test_data
     
@@ -121,8 +120,9 @@ if __name__ == "__main__":
         print(prediction)
     
     # calculate the accuracy (local use only)
-    # accuracy = np.mean(predictions == test_results)
-    # print(f"Accuracy: {accuracy}")
+    test_results = test_data['label']
+    accuracy = np.mean(predictions == test_results)
+    print(f"Accuracy: {accuracy}")
         
         
 
