@@ -1,5 +1,6 @@
 # Basketball Prediction
 Goal: construct a naive bayes classifier to predict the results of basketball games
+
 Result: Predict with 67.4% accuracy the result of a basketball game based on data from 10,000 previous basketball games
 
 # Data
